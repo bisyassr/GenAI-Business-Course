@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Course: Generative AI in Business</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Strategic Neutrals -->
+    <!-- Application Structure Plan: The application is designed as a single-page, tab-based interactive dashboard. This structure replaces the linear, text-heavy format of the source report with an exploratory experience. The three main tabs correspond to the course's three series: "Discover," "Plan," and "Execute." This allows busy leaders (the target audience) to immediately navigate to the section most relevant to their needs, such as risk assessment or implementation strategy. Within each tab, content is broken down into interactive modules like clickable cards, dynamic charts, and interactive diagrams. This non-linear, task-oriented design enhances usability by prioritizing engagement, quick information retrieval, and self-assessment over passive reading, making the complex subject matter more accessible and digestible. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: 'Table 1: Generative AI Capabilities' -> Goal: Compare -> Viz: Interactive Bar Chart (Chart.js) -> Interaction: Buttons filter the chart by value proposition (e.g., Efficiency, Innovation), dynamically updating the data. -> Justification: Transforms a static table into a dynamic tool for comparing how different GenAI capabilities contribute to specific business values, making the data more engaging.
+        - Report Info: 'Table 4: Readiness Assessment Checklist' -> Goal: Inform/Organize -> Viz: Interactive Checklist (HTML/CSS/JS) -> Interaction: Users can check items, and a progress bar dynamically updates. -> Justification: Turns a passive checklist into a self-assessment tool, providing immediate visual feedback on organizational readiness.
+        - Report Info: 'Table 3: Risks and Mitigation' -> Goal: Inform/Organize -> Viz: Interactive Grid (HTML/CSS/JS) -> Interaction: Clicking a risk category card reveals its detailed description and mitigation strategy. -> Justification: Breaks down dense information into manageable, clickable chunks, improving readability and focus.
+        - Report Info: 'Table 5: Adoption Maturity Model' -> Goal: Organize/Change -> Viz: Interactive Process Diagram (HTML/CSS/JS) -> Interaction: Clicking on a stage in the visual timeline displays detailed information about that stage. -> Justification: Represents a process more intuitively than a table, helping users understand the sequential nature of AI adoption.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-active { 
+            border-color: #3b82f6; 
+            color: #3b82f6; 
+            background-color: #eff6ff;
+        }
+        .tab-inactive { 
+            border-color: transparent; 
+            color: #6b7280; 
+        }
+        .content-active { display: block; }
+        .content-inactive { display: none; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        .card-enter {
+            animation: card-enter 0.5s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        @keyframes card-enter {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">Generative AI in Business</h1>
+            <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">A strategic guide for leaders to evaluate, implement, and scale Generative AI solutions for their unique business needs.</p>
+        </header>
+
+        <nav class="mb-8 border-b border-slate-200">
+            <ul class="flex flex-wrap -mb-px justify-center text-sm font-medium text-center" id="tab-navigation">
+                <li class="mr-2">
+                    <button class="tab-btn inline-block p-4 border-b-2 rounded-t-lg transition-colors duration-300" data-tab="discover">1. Discover Possibilities</button>
+                </li>
+                <li class="mr-2">
+                    <button class="tab-btn inline-block p-4 border-b-2 rounded-t-lg transition-colors duration-300" data-tab="plan">2. Planning Framework</button>
+                </li>
+                <li>
+                    <button class="tab-btn inline-block p-4 border-b-2 rounded-t-lg transition-colors duration-300" data-tab="execute">3. Strategies for Execution</button>
+                </li>
+            </ul>
+        </nav>
+
+        <main id="tab-content">
+            <!-- Series 1: Discovering Possibilities -->
+            <section id="discover" class="tab-pane">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-slate-900">Series 1: Discovering Possibilities</h2>
+                    <p class="mt-2 text-md text-slate-500 max-w-2xl mx-auto">This section establishes a fundamental understanding of Generative AI, its core capabilities, and its limitations. Explore the interactive elements below to grasp the transformative potential for your business.</p>
+                </div>
+                
+                <div class="space-y-12">
+                    <!-- Key Capabilities Chart -->
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <h3 class="text-xl font-semibold mb-1 text-slate-900">Interactive Capability Matrix</h3>
+                        <p class="text-slate-600 mb-4">Generative AI offers a wide range of capabilities. Select a value proposition below to see which AI capabilities drive it. This helps in identifying the most relevant technologies for your strategic goals.</p>
+                        <div id="capability-chart-controls" class="flex flex-wrap justify-center gap-2 mb-4"></div>
+                        <div class="chart-container">
+                            <canvas id="capabilitiesChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Core Concepts -->
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <h3 class="text-xl font-semibold mb-1 text-slate-900">Core Concepts Explorer</h3>
+                        <p class="text-slate-600 mb-6">Click on a concept to learn more. Understanding these foundational ideas is the first step toward strategic implementation.</p>
+                        <div id="core-concepts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    </div>
+
+                    <!-- Limitations -->
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                         <h3 class="text-xl font-semibold mb-1 text-slate-900">Limitations & Shortcomings</h3>
+                        <p class="text-slate-600 mb-6">While powerful, GenAI has fundamental limitations. Awareness of these is crucial for effective risk management and setting realistic expectations.</p>
+                        <div id="limitations-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Series 2: Planning Framework -->
+            <section id="plan" class="tab-pane">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-slate-900">Series 2: The Planning Framework</h2>
+                    <p class="mt-2 text-md text-slate-500 max-w-2xl mx-auto">This section provides a structured approach to planning your GenAI adoption. Use the interactive tools to assess your organization's readiness and understand key risks.</p>
+                </div>
+
+                <div class="space-y-12">
+                    <!-- Readiness Checklist -->
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <h3 class="text-xl font-semibold mb-1 text-slate-900">Organizational Readiness Checklist</h3>
+                        <p class="text-slate-600 mb-6">How prepared is your organization for GenAI? Use this checklist to self-assess your readiness across key dimensions. Your progress is tracked automatically.</p>
+                        <div class="mb-4">
+                            <div class="w-full bg-slate-200 rounded-full h-2.5">
+                                <div id="readiness-progress-bar" class="bg-blue-500 h-2.5 rounded-full" style="width: 0%; transition: width 0.5s ease-in-out;"></div>
+                            </div>
+                            <p id="readiness-progress-text" class="text-center text-sm mt-2 font-medium text-slate-700">0% Complete</p>
+                        </div>
+                        <div id="readiness-checklist" class="space-y-4"></div>
+                    </div>
+
+                    <!-- Risks and Mitigation -->
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                         <h3 class="text-xl font-semibold mb-1 text-slate-900">Risk & Mitigation Explorer</h3>
+                        <p class="text-slate-600 mb-6">GenAI introduces new risks. Click on each category to understand the specific threat and the recommended strategies to mitigate it.</p>
+                        <div id="risks-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                        <div id="risk-details" class="mt-6 p-4 bg-slate-100 rounded-lg min-h-[100px] transition-all duration-300">
+                             <p class="text-slate-500 text-center">Select a risk category to see details.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Series 3: Strategies for Execution -->
+            <section id="execute" class="tab-pane">
+                 <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-slate-900">Series 3: Strategies for Execution</h2>
+                    <p class="mt-2 text-md text-slate-500 max-w-2xl mx-auto">This section provides practical guidance for executing GenAI initiatives, from pilot projects to enterprise-wide scaling. Interact with the model to see the path to a sustainable AI future.</p>
+                </div>
+                
+                <div class="space-y-12">
+                     <!-- Adoption Maturity Model -->
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <h3 class="text-xl font-semibold mb-1 text-slate-900">Interactive Adoption Maturity Model</h3>
+                        <p class="text-slate-600 mb-6">GenAI adoption is a journey. Click through the stages of the maturity model to understand the key activities, roles, and expected outcomes at each step of the way.</p>
+                        <div class="lg:flex lg:gap-8">
+                            <div id="maturity-model-stages" class="flex flex-col gap-2 mb-6 lg:mb-0 lg:w-1/3"></div>
+                            <div id="maturity-model-details" class="flex-1 p-6 bg-slate-100 rounded-lg min-h-[250px]">
+                                <p class="text-slate-500 text-center">Select a stage to view details.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Execution Topics -->
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                         <h3 class="text-xl font-semibold mb-1 text-slate-900">Key Execution Strategies</h3>
+                        <p class="text-slate-600 mb-6">Successful execution involves more than technology. Explore these critical topics for scaling AI responsibly and maximizing your return on investment.</p>
+                         <div id="execution-topics-accordion" class="space-y-3"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const data = {
+        capabilities: [
+            { capability: 'Text Generation', impacts: ['Accelerated Content Creation', 'Enhanced Customer Service', 'Streamlined Software Development'], value: ['Efficiency Gains', 'Cost Reduction', 'Enhanced Customer Experience'] },
+            { capability: 'Image/Video/Audio Synthesis', impacts: ['New Product Design', 'Personalized Marketing', 'Media Production'], value: ['Innovation', 'Revenue Growth', 'Cost Reduction'] },
+            { capability: 'Code Generation', impacts: ['Faster Software Development', 'Legacy System Modernization', 'Automation of Coding Tasks'], value: ['Efficiency Gains', 'Cost Reduction'] },
+            { capability: 'Advanced Reasoning', impacts: ['Improved Decision Making', 'Faster R&D', 'Nuanced Analysis'], value: ['Innovation', 'Efficiency Gains', 'Revenue Growth'] },
+            { capability: 'Agentic AI', impacts: ['Autonomous Operations', 'Proactive Customer Service', 'Automated Workflows'], value: ['Efficiency Gains', 'Cost Reduction', 'Enhanced Customer Experience'] },
+            { capability: 'Multimodality', impacts: ['Comprehensive Content Understanding', 'Richer User Interactions', 'Cross-Modal Content Creation'], value: ['Enhanced Customer Experience', 'Innovation'] },
+            { capability: 'Data Synthesis', impacts: ['Fraud Detection', 'Credit Scoring', 'Synthetic Data for Training'], value: ['Risk Mitigation', 'Efficiency Gains', 'Innovation'] }
+        ],
+        coreConcepts: [
+            { title: "Generative AI", content: "AI that creates new, realistic content (text, images, code) by learning patterns from existing data, rather than just analyzing or classifying it." },
+            { title: "Large Language Models (LLMs)", content: "The foundational models behind most modern GenAI. Trained on vast text data, they understand, generate, and reason with natural language." },
+            { title: "Multimodal Models (MLLMs)", content: "An evolution of LLMs that can process and integrate information from multiple data types, such as text, images, and audio, enabling richer interactions." },
+            { title: "Agentic AI", content: "AI systems capable of autonomous planning, decision-making, and taking actions to achieve goals, going beyond simple content generation." },
+            { title: "Diffusion Models", content: "A technique, popular for image generation, that works by progressively adding noise to an image and then learning how to reverse the process to create new images from scratch." },
+            { title: "Prompt Engineering", content: "The art and science of designing effective inputs (prompts) to guide a GenAI model to produce the most accurate, relevant, and useful output." }
+        ],
+        limitations: [
+            { icon: '🧠', title: "Hallucinations", content: "Models can generate convincing but factually incorrect or nonsensical information, presenting it with confidence. Requires human validation." },
+            { icon: '⚖️', title: "Bias", content: "AI can perpetuate and amplify biases present in its training data, leading to unfair or stereotypical outputs. Requires careful data auditing." },
+            { icon: '🔒', title: "Privacy & Security", content: "Risks include re-identifying anonymized data and malicious use for deepfakes or large-scale cyberattacks." },
+            { icon: '📦', title: "The Black Box Problem", content: "The complex internal workings of many models are opaque, making it difficult to understand the reasoning behind specific outputs." },
+            { icon: '©️', title: "Intellectual Property", content: "Models might reproduce copyrighted content from training data, and users risk sharing proprietary information via prompts." },
+            { icon: '🤔', title: "Silent Assumptions", content: "Models often have implicit biases (e.g., assuming data points are independent) that can lead to flawed outputs in complex, real-world scenarios." }
+        ],
+        readinessChecklist: [
+            { category: "Strategic Alignment", items: ["Clear GenAI vision aligned with business goals?", "Use cases prioritized by business value?", "Executive buy-in and top-down mandate secured?"] },
+            { category: "Data Readiness", items: ["High-quality, relevant data available for AI?", "Robust data governance (quality, privacy, security) in place?", "Strategy for leveraging proprietary data defined?"] },
+            { category: "Technology & Tools", items: ["Appropriate GenAI models selected for use cases?", "IT infrastructure scalable for GenAI deployments?", "Clear integration strategy with existing systems?"] },
+            { category: "Talent & Skills", items: ["Workforce trained in AI literacy and responsible use?", "Job roles redefined for human-AI collaboration?", "Plan to acquire/develop specialist AI talent?"] },
+            { category: "Risk & Compliance", items: ["Potential risks (bias, IP, etc.) identified and assessed?", "Responsible AI frameworks and guardrails in place?", "Mechanism for monitoring evolving regulations?"] }
+        ],
+        risks: [
+            { category: "Bias & Discrimination", description: "Perpetuating stereotypes or unfair outcomes (e.g., in hiring).", mitigation: "Data auditing for representativeness, continuous monitoring, algorithmic checks, and regular assessment of decision-making patterns." },
+            { category: "Hallucinations", description: "Factually incorrect outputs presented with authority.", mitigation: "Human-in-the-loop validation, rigorous testing, and setting realistic expectations for AI outputs." },
+            { category: "Privacy Breaches", description: "Data re-identification and exposure of sensitive information.", mitigation: "Robust data governance, encryption, strict access controls, and privacy-preserving AI techniques." },
+            { category: "Cybersecurity Threats", description: "Use for deepfakes, impersonation, and large-scale cyberattacks.", mitigation: "Revamp cyber protections, employ advanced threat detection, and train employees on AI-driven scams." },
+            { category: "IP Infringement", description: "Copyright violation from training data or inadvertent sharing of internal IP.", mitigation: "Legal review of outputs, IP scanning tools, strict data input policies, and third-party vendor monitoring." },
+            { category: "Opacity (Black Box)", description: "Lack of explainability for model decisions and outputs.", mitigation: "Use transparency frameworks, document model development, prefer interpretable algorithms, and deploy cautiously." }
+        ],
+        maturityModel: [
+            { stage: "1: Discover", title: "Initial learning and exploration.", activities: "Awareness workshops, market research, initial strategy development.", roles: "Executives, Senior Managers, R&D, Strategy Teams.", outcomes: "Clear vision for GenAI, identified impact areas, understanding of business value." },
+            { stage: "2: Explore", title: "Hands-on experimentation and training.", activities: "In-depth tech training, pilot use case identification, readiness assessment.", roles: "IT Teams, Data Scientists, Engineers, Product Managers.", outcomes: "Enhanced technical understanding, identified pilot opportunities, readiness gap analysis." },
+            { stage: "3: Prototype", title: "Development of initial AI solutions.", activities: "Solution design (MVP), pilot execution in controlled environment, performance evaluation.", roles: "Product Managers, Engineers, Data Scientists.", outcomes: "Validated use cases, measurable ROI from pilot, refined solution based on learnings." },
+            { stage: "4: Scale", title: "Broad integration across the organization.", activities: "Enterprise-wide scaling strategy, asset development, continuous monitoring, change management.", roles: "Executives, Strategy Teams, Engineering, Operations.", outcomes: "Enterprise-wide integration, reusable AI assets, sustained business value." }
+        ],
+        executionTopics: [
+            { title: "Long-term Governance & Ethical Oversight", content: "Building a sustainable AI future requires a steadfast commitment to ethical oversight. This involves preventing discriminatory systems, maintaining user privacy, and ensuring clear accountability. Establishing an AI Ethics Committee is crucial for institutionalizing this oversight." },
+            { title: "Adapting to Evolving Capabilities & Regulations", content: "The GenAI landscape evolves rapidly. Organizations must build an 'AI Horizon Scanning' capability to monitor new tech and regulations. Continuous learning and active participation in the broader AI ecosystem are imperative to stay ahead." },
+            { title: "Measuring and Maximizing ROI", content: "Maximizing return on investment goes beyond traditional cost-benefit analysis. It requires a holistic approach, measuring both quantitative metrics (cost savings, revenue) and qualitative benefits (innovation capacity, brand reputation). The true value comes from scaling and building reusable AI capabilities." }
+        ]
+    };
+    
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+
+    function switchTab(targetTabId) {
+        tabPanes.forEach(pane => {
+            if (pane.id === targetTabId) {
+                pane.classList.remove('content-inactive');
+                pane.classList.add('content-active');
+            } else {
+                pane.classList.remove('content-active');
+                pane.classList.add('content-inactive');
+            }
+        });
+
+        tabButtons.forEach(button => {
+            if (button.dataset.tab === targetTabId) {
+                button.classList.add('tab-active');
+                button.classList.remove('tab-inactive');
+            } else {
+                button.classList.remove('tab-active');
+                button.classList.add('tab-inactive');
+            }
+        });
+        window.scrollTo(0, 0);
+    }
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            switchTab(button.dataset.tab);
+        });
+    });
+
+    // Initial state
+    switchTab('discover');
+
+    // --- Series 1: Discover ---
+    let capabilitiesChart;
+    function renderCapabilitiesChart(filterValue = 'All') {
+        const ctx = document.getElementById('capabilitiesChart').getContext('2d');
+        const chartData = {
+            labels: data.capabilities.map(c => c.capability),
+            datasets: [{
+                label: 'Number of Value Propositions Driven',
+                data: data.capabilities.map(c => {
+                    if (filterValue === 'All') {
+                        return c.value.length;
+                    }
+                    return c.value.includes(filterValue) ? 1 : 0;
+                }),
+                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        const config = {
+            type: 'bar',
+            data: chartData,
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                           stepSize: 1
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            autoSkip: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const cap = data.capabilities[context.dataIndex];
+                                return `Impacts: ${cap.impacts.join(', ')}`;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        if (capabilitiesChart) {
+            capabilitiesChart.destroy();
+        }
+        capabilitiesChart = new Chart(ctx, config);
+    }
+
+    const valuePropositions = ['All', ...new Set(data.capabilities.flatMap(c => c.value))];
+    const chartControlsContainer = document.getElementById('capability-chart-controls');
+    valuePropositions.forEach(vp => {
+        const button = document.createElement('button');
+        button.textContent = vp;
+        button.className = `px-3 py-1 text-sm font-medium rounded-full transition-colors duration-200 ${vp === 'All' ? 'bg-blue-500 text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}`;
+        button.addEventListener('click', () => {
+            renderCapabilitiesChart(vp);
+            document.querySelectorAll('#capability-chart-controls button').forEach(btn => {
+                btn.className = 'px-3 py-1 text-sm font-medium rounded-full transition-colors duration-200 bg-slate-200 text-slate-700 hover:bg-slate-300';
+            });
+            button.className = 'px-3 py-1 text-sm font-medium rounded-full transition-colors duration-200 bg-blue-500 text-white';
+        });
+        chartControlsContainer.appendChild(button);
+    });
+    
+    const conceptsContainer = document.getElementById('core-concepts-grid');
+    data.coreConcepts.forEach((concept, index) => {
+        const card = document.createElement('div');
+        card.className = 'bg-slate-100 p-4 rounded-lg cursor-pointer hover:bg-blue-100 hover:shadow-lg transition-all duration-300 card-enter';
+        card.style.animationDelay = `${index * 100}ms`;
+        card.innerHTML = `<h4 class="font-semibold text-slate-800">${concept.title}</h4>`;
+        card.addEventListener('click', () => {
+            const existingDetails = card.querySelector('p');
+            if(existingDetails) {
+                existingDetails.remove();
+            } else {
+                 const detail = document.createElement('p');
+                 detail.className = 'text-slate-600 mt-2 text-sm';
+                 detail.textContent = concept.content;
+                 card.appendChild(detail);
+            }
+        });
+        conceptsContainer.appendChild(card);
+    });
+
+    const limitationsContainer = document.getElementById('limitations-grid');
+    data.limitations.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'bg-white border border-slate-200 p-5 rounded-lg text-center card-enter';
+        card.style.animationDelay = `${index * 100}ms`;
+        card.innerHTML = `
+            <div class="text-4xl mb-3">${item.icon}</div>
+            <h4 class="font-semibold text-md text-slate-900">${item.title}</h4>
+            <p class="text-slate-600 text-sm mt-1">${item.content}</p>
+        `;
+        limitationsContainer.appendChild(card);
+    });
+
+
+    // --- Series 2: Plan ---
+    const checklistContainer = document.getElementById('readiness-checklist');
+    const progressBar = document.getElementById('readiness-progress-bar');
+    const progressText = document.getElementById('readiness-progress-text');
+    let totalCheckboxes = 0;
+    let checkedCheckboxes = 0;
+
+    data.readinessChecklist.forEach(category => {
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = 'p-4 border border-slate-200 rounded-lg';
+        const categoryTitle = document.createElement('h4');
+        categoryTitle.className = 'font-semibold text-slate-900 mb-3';
+        categoryTitle.textContent = category.category;
+        categoryDiv.appendChild(categoryTitle);
+        
+        const itemsList = document.createElement('div');
+        itemsList.className = 'space-y-2';
+        category.items.forEach(itemText => {
+            totalCheckboxes++;
+            const label = document.createElement('label');
+            label.className = 'flex items-center space-x-3 cursor-pointer text-slate-700';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500';
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    checkedCheckboxes++;
+                } else {
+                    checkedCheckboxes--;
+                }
+                updateProgress();
+            });
+            const span = document.createElement('span');
+            span.textContent = itemText;
+            label.appendChild(checkbox);
+            label.appendChild(span);
+            itemsList.appendChild(label);
+        });
+
+        categoryDiv.appendChild(itemsList);
+        checklistContainer.appendChild(categoryDiv);
+    });
+
+    function updateProgress() {
+        const percentage = totalCheckboxes > 0 ? (checkedCheckboxes / totalCheckboxes) * 100 : 0;
+        progressBar.style.width = `${percentage}%`;
+        progressText.textContent = `${Math.round(percentage)}% Complete`;
+    }
+    
+    const risksGrid = document.getElementById('risks-grid');
+    const riskDetails = document.getElementById('risk-details');
+    data.risks.forEach(risk => {
+        const card = document.createElement('button');
+        card.className = 'p-4 bg-slate-50 border border-slate-200 rounded-lg text-left hover:bg-blue-100 hover:border-blue-300 transition-all duration-200';
+        card.innerHTML = `<h4 class="font-semibold text-slate-800">${risk.category}</h4>`;
+        card.addEventListener('click', () => {
+            riskDetails.innerHTML = `
+                <h4 class="font-bold text-lg text-slate-900 mb-2">${risk.category}</h4>
+                <p class="text-slate-700 mb-3"><span class="font-semibold">Description:</span> ${risk.description}</p>
+                <p class="text-slate-700"><span class="font-semibold">Mitigation Strategy:</span> ${risk.mitigation}</p>
+            `;
+            document.querySelectorAll('#risks-grid button').forEach(btn => btn.classList.remove('bg-blue-200', 'border-blue-400'));
+            card.classList.add('bg-blue-200', 'border-blue-400');
+        });
+        risksGrid.appendChild(card);
+    });
+
+    // --- Series 3: Execute ---
+    const maturityStagesContainer = document.getElementById('maturity-model-stages');
+    const maturityDetailsContainer = document.getElementById('maturity-model-details');
+
+    data.maturityModel.forEach((item, index) => {
+        const stageButton = document.createElement('button');
+        stageButton.className = 'w-full p-4 border-l-4 border-slate-200 text-left hover:bg-slate-100 transition-colors duration-200';
+        stageButton.innerHTML = `
+            <div class="font-bold text-slate-800">${item.stage}</div>
+            <div class="text-sm text-slate-600">${item.title}</div>
+        `;
+        stageButton.addEventListener('click', () => {
+            maturityDetailsContainer.innerHTML = `
+                <h4 class="font-bold text-xl text-slate-900 mb-4">${item.stage}: ${item.title}</h4>
+                <div class="space-y-3 text-slate-700">
+                    <p><strong class="font-semibold">Key Activities:</strong> ${item.activities}</p>
+                    <p><strong class="font-semibold">Target Roles:</strong> ${item.roles}</p>
+                    <p><strong class="font-semibold">Expected Outcomes:</strong> ${item.outcomes}</p>
+                </div>
+            `;
+            document.querySelectorAll('#maturity-model-stages button').forEach(btn => btn.classList.remove('bg-blue-100', 'border-blue-500'));
+            stageButton.classList.add('bg-blue-100', 'border-blue-500');
+        });
+        maturityStagesContainer.appendChild(stageButton);
+        if (index === 0) {
+            stageButton.click();
+        }
+    });
+
+    const accordionContainer = document.getElementById('execution-topics-accordion');
+    data.executionTopics.forEach(topic => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'border border-slate-200 rounded-lg overflow-hidden';
+        
+        const button = document.createElement('button');
+        button.className = 'w-full p-4 text-left font-semibold text-slate-800 bg-slate-100 hover:bg-slate-200 flex justify-between items-center transition-colors duration-200';
+        button.innerHTML = `
+            <span>${topic.title}</span>
+            <span class="transform transition-transform duration-300">&#9662;</span>
+        `;
+        
+        const content = document.createElement('div');
+        content.className = 'p-4 bg-white text-slate-600 max-h-0 overflow-hidden transition-all duration-500 ease-in-out';
+        content.innerHTML = `<p>${topic.content}</p>`;
+
+        button.addEventListener('click', () => {
+            const isVisible = content.style.maxHeight !== '0px';
+            if (isVisible) {
+                content.style.maxHeight = '0px';
+                button.querySelector('span:last-child').style.transform = 'rotate(0deg)';
+            } else {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                button.querySelector('span:last-child').style.transform = 'rotate(180deg)';
+            }
+        });
+        
+        wrapper.appendChild(button);
+        wrapper.appendChild(content);
+        accordionContainer.appendChild(wrapper);
+    });
+
+    // Trigger chart render on first view
+    const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                renderCapabilitiesChart();
+                obs.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    observer.observe(document.getElementById('discover'));
+
+});
+</script>
+</body>
+</html>
